@@ -102,7 +102,7 @@ def test_immirzi():
     assert abs(float(lo) - 0.27406685823282999) < 1e-15
 
 
-# G14 volume
+# G17 volume
 def test_volume():
     from qg import volume
     import numpy as np
@@ -112,7 +112,7 @@ def test_volume():
     assert 4096 * (1 - volume.ratio_regular(4096)) == pytest.approx(0.75, abs=1e-3)
 
 
-# G15 clusters
+# G18 clusters
 def test_clusters():
     from qg import cluster_gap as cg
     g = lambda cells: cg.gap(cg.planar_cluster(cells))[0]

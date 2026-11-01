@@ -1,6 +1,6 @@
-# Progress on G0–G16
+# Progress on G0–G19
 
-Ideas are as numbered in [docs/03-ideas.md](docs/03-ideas.md). Status as of 2026-11-01. G13–G16 come from Brent Hartshorn's quantum gravity paper (see `docs/hartshorn-bridge.md`).
+Ideas are as numbered in [docs/03-ideas.md](docs/03-ideas.md). Status as of 2026-11-01. G13–G19 come from, or answer, Brent Hartshorn's quantum gravity paper (`docs/hartshorn-bridge.md`); G13–G17 were numbered in his PR (#1) and are kept.
 
 | Idea | What | Status | Where |
 |---|---|---|---|
@@ -17,17 +17,22 @@ Ideas are as numbered in [docs/03-ideas.md](docs/03-ideas.md). Status as of 2026
 | G10 | YM₂ on Liouville quantum gravity | Brownian-disk Wilson loop **derived and checked**; sphere sectors shift μ | `python/qg/ym2_brownian.py`, `paper/` |
 | G11 | Decoherence–diffusion trade-off for QGL | saturating model **built and checked**; port into QGL **to do** (Brent's repo) | `python/qg/cq_tradeoff.py` |
 | G12 | Small QGL tests | Gauss–Kuzmin for BKL eras **checked** | `python/qg/bkl_billiard.py` |
-| G13 | Immirzi parameter over all spins (Hartshorn's open item) | **certified to 25 digits**: 0.2375329579659206643583771 (2 states per puncture), 0.2740668582328299962167637 (2j+1) | `python/qg/immirzi.py` |
-| G14 | Volume operator: prefactor and semiclassical limit (Hartshorn's open items) | closed-form tridiagonal elements **checked against brute force**; prefactor (√2/3)(8πγℓ_P²)^{3/2}√\|Q\|; ratio → 1 with **j(1 − ratio) → 3/4** (numerics to j = 65536; proof to do) | `python/qg/volume.py` |
-| G15 | Harmonic gaps of plaquette clusters | **one formula** Δ = √(2 μ_min(∂∂ᵀ)); strip formula for all N **proved in Lean**; L-shape = strip explained; predictions 2×2 → 2, T → 2.12977 | `ClusterModes.lean`, `python/qg/cluster_gap.py` |
-| G16 | Dimension four, twice (Hartshorn) | **Lean** | `GravityGroups.dim_four_twice` |
+| G13 | Immirzi parameter from counting punctures | three conventions, **two independent implementations agree**: 0.12738… (spin ½), **0.2375329579659206643583771** (Domagala–Lewandowski, 2 states), **0.2740668582328299962167637** (Ghosh–Mitra, 2j+1), certified by bisection with a tail bound; the direct renewal count approaches the root from below | `python/qg/immirzi.py`, `docs/G13-immirzi-counting.md` |
+| G14 | Kerr horizons and the Penrose gap (Hartshorn) | identities (Smarr, first law at both horizons, Penrose gap M r₋/2, A₊A₋ = (8πJ)²) **checked exactly**; the heuristic composition with spin-½ area is labelled as such | `python/qg/kerr.py`, `docs/G14-kerr-horizons.md` |
+| G15 | Planar maps, FK weights, SU(2)_k loop weight (Hartshorn) | Tutte and Mullin counts by brute force, FK dictionary, closed walks on A_{k+1} **checked**; no map from spin networks to maps constructed | `python/qg/planar_maps.py`, `docs/G15-planar-maps-su2k.md` |
+| G16 | SU(2) strip of N = 3, 4, 5 plaquettes in the spin-network basis (Hartshorn) | N = 4, 5 levels **agree** with an independent Peter–Weyl calculation (2e-6, 1e-3) under a fitted phase rule; N = 4 weak-coupling gap ratio to N = 3 **consistent** with the formula (0.9624 vs 0.9598, two-point extrapolation); N = 5 not done. The harmonic limit of the formula is proved for every N (G18) | `python/qg/spin_network_strip.py`, `docs/G16-spin-network-strip.md` |
+| G17 | Volume operator: prefactor and semiclassical limit | prefactor c = √2/3 **fixed** by the regular tetrahedron (exact); smallest volume 1.777 ℓ_P³ (Hartshorn, to j = 40). Closed-form tridiagonal matrix elements **checked against brute force**; j(1 − ratio) → **3/4** to j = 65536 (Romanov); proof to do | `python/qg/volume_tetrahedron.py`, `python/qg/volume.py`, `docs/G17-volume-prefactor.md` |
+| G18 | Harmonic gaps of plaquette clusters | **one formula** Δ = √(2 μ_min(∂∂ᵀ)); strip formula for all N **proved in Lean**; L-shape = strip explained; predictions 2×2 → 2, T → 2.12977 | `ClusterModes.lean`, `python/qg/cluster_gap.py` |
+| G19 | Dimension four, twice (Hartshorn's observation) | **Lean** | `GravityGroups.dim_four_twice` |
 
 ## Next steps, in order
 
+0. G16: a faster state generator to reach g² < 0.4 at N = 4, 5 and test 2√(2 − cos(π/(N+1))) beyond the harmonic
+   limit (G18); SU(2)_k deformation of the strip with quantum 6j (the link to G9).
 1. G8: rigorous area law for SO(4) vector loops at β_W < 4/29, with explicit constants (polymer expansion), to add to
    the paper.
-2. G14: prove j(1 − ratio) → 3/4 (Bohr–Sommerfeld for the tridiagonal a_k, or a WKB analysis of the Jacobi matrix).
-3. G15: send the 2×2 and T-shape predictions to Brent for his full-Hamiltonian code.
+2. G17: prove j(1 − ratio) → 3/4 (Bohr–Sommerfeld for the tridiagonal a_k, or a WKB analysis of the Jacobi matrix).
+3. G18: run the 2×2 and T-shape predictions through Brent's full-Hamiltonian code (`spin_network_strip.py` generalised to planar clusters).
 4. G2: the Lipschitz constant of the pair term and Hessian bound of the MacDowell–Mansouri plaquette-pair action on the 4Y-M forest, in Lean
    like `GaugeFix.lean`.
 5. G4: the induced-gravity expansion on degree-capped complexes.

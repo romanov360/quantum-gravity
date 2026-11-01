@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G14. The quantum tetrahedron: prefactor, closed-form matrix elements, and the semiclassical limit.
+"""G17. The quantum tetrahedron: prefactor, closed-form matrix elements, and the semiclassical limit.
 
 Hartshorn (qgravity paper, Sec. 4) computes the triple product Q = eps_abc J1a J2b J3c on four-valent intertwiner
 spaces and finds that lambda_max(Q) / ((4 / 3 sqrt 3) [j (j+1)]^(3/2)) rises from 0.794 (j = 3/2) to 0.921 (j = 8),

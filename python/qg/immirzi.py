@@ -17,13 +17,22 @@ and the tail is a geometric(-type) series summed in closed form. Arithmetic is 6
 
 Not claimed: which counting is right. That is a question about the quantum horizon (and, in newer work, about
 the SU(2) Chern-Simons treatment), not about this arithmetic.
+Two independent implementations live here and are checked against each other in the tests:
+  * `solve(kind)` / `f_bounds`: bisection with the explicit tail bound above, 60-digit arithmetic (Romanov);
+  * `gamma_spin_half`, `gamma_domagala_lewandowski`, `gamma_all_spins`, `renewal_sum`: Newton root finding, and
+    `growth_rate`: the direct count N(x) = 1 + sum_j (2j+1) N(x - a_j) of puncture sequences of area <= x, whose
+    growth rate ln N(x)/x approaches the root lambda = 2 pi gamma from below (Hartshorn).
 Run: python3 python/qg/immirzi.py
 """
 from __future__ import annotations
 
-import mpmath as mp
+import math
 
-mp.mp.dps = 60
+import mpmath as _mpm
+from mpmath import mpf, findroot, sqrt, log, pi, exp
+
+_mpm.mp.dps = 60
+mp = _mpm
 
 
 def _terms(gamma, weight, J):
@@ -72,14 +81,60 @@ def spin_half():
     return mp.log(2) / (mp.pi * mp.sqrt(3))
 
 
+def a_j(two_j: int) -> mpf:
+    j = mpf(two_j) / 2
+    return sqrt(j * (j + 1))
+
+
+def renewal_sum(lam, jmax_two: int = 4000):
+    """F(lam) = sum_{j=1/2,1,...} (2j+1) exp(-lam sqrt(j(j+1))); terms decay like (2j) e^{-lam j}."""
+    return sum((mpf(tj) + 1) * exp(-lam * a_j(tj)) for tj in range(1, jmax_two + 1))
+
+
+def gamma_spin_half() -> mpf:
+    return log(2) / (pi * sqrt(3))
+
+
+def gamma_all_spins() -> mpf:
+    lam = findroot(lambda x: renewal_sum(x) - 1, mpf("1.5"))
+    return lam / (2 * pi)
+
+
+def gamma_domagala_lewandowski() -> mpf:
+    """Domagala-Lewandowski counting (only the extreme projections m = +-j per puncture, degeneracy 2): sum_j 2 exp(-lam a_j) = 1."""
+    lam = findroot(lambda x: 2 * sum(exp(-x * a_j(tj)) for tj in range(1, 4000)) - 1, mpf("1.2"))
+    return lam / (2 * pi)
+
+
+def growth_rate(x_max: float = 40.0, h: float = 0.005):
+    """Discretised renewal equation  N(x) = 1 + sum_j (2j+1) N(x - a_j)  (number of puncture sequences of total area <= x, including the empty one).
+    Returns ln N(x)/x at x_max, which tends to lambda from below as x -> infinity (N ~ C e^{lambda x})."""
+    import numpy as np
+    n = int(x_max / h) + 1
+    N = np.ones(n)
+    steps = [(int(round(math.sqrt((tj / 2) * (tj / 2 + 1)) / h)), tj + 1) for tj in range(1, int(2 * x_max) + 2)]
+    steps = [(s, d) for s, d in steps if 0 < s < n]
+    for i in range(n):
+        acc = 1.0
+        for s, d in steps:
+            if i - s < 0:
+                break
+            acc += d * N[i - s]
+        N[i] = acc
+    return math.log(N[-1]) / (n * h), N
+
+
+
 def main():
-    print(f"(a) spin-1/2 only:            gamma = ln2/(pi sqrt3) = {mp.nstr(spin_half(), 20)}")
+    print(f"(a) spin-1/2 only:            gamma = ln2/(pi sqrt3) = {mp.nstr(gamma_spin_half(), 20)}")
     lo, hi = solve("two")
-    print(f"(b) all spins, 2 states:      gamma in [{mp.nstr(lo, 25)}, {mp.nstr(hi, 25)}]")
+    print(f"(b) all spins, 2 states (DL): gamma in [{mp.nstr(lo, 25)}, {mp.nstr(hi, 25)}]  "
+          f"(Newton: {mp.nstr(gamma_domagala_lewandowski(), 15)})")
     lo2, hi2 = solve("dim")
-    print(f"(c) all spins, 2j+1 states:   gamma in [{mp.nstr(lo2, 25)}, {mp.nstr(hi2, 25)}]")
-    print("Spin-1/2 counting with the bound from (b): each puncture of spin j contributes area sqrt(j(j+1)) and")
-    print("at most 2 states; allowing larger spins can only raise gamma, since more states fit in a given area.")
+    print(f"(c) all spins, 2j+1 states:   gamma in [{mp.nstr(lo2, 25)}, {mp.nstr(hi2, 25)}]  "
+          f"(Newton: {mp.nstr(gamma_all_spins(), 15)})")
+    r, _ = growth_rate(25.0, 0.01)
+    print(f"direct count (c): ln N(x)/x at x = 25 -> {r:.5f}, below lambda = {float(2 * pi * gamma_all_spins()):.5f}")
 
 
 if __name__ == "__main__":

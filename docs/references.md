@@ -71,3 +71,17 @@
 
 ## Formalisation
 - ✓ PhysLean (formerly HepLean), reservoir.lean-lang.org/@HEPLean/HepLean; PhysProver, arXiv:2601.15737.
+
+## Added with G13–G17 (Hartshorn, PR #1)
+- ✓ S. Ghosh, P. Mitra, *An improved estimate of black hole entropy in the quantum geometry approach*, gr-qc/0411035
+  (all-spin count, Σ_j (2j+1) e^{−λ√(j(j+1))} = 1, γ ≈ 0.274; also states the Domagala–Lewandowski equation 2e^{…}).
+- *background* M. Domagala, J. Lewandowski, *Black hole entropy from quantum geometry*, CQG 21 (2004) 5233, gr-qc/0407051;
+  K. Meissner, *Black hole entropy in loop quantum gravity*, CQG 21 (2004) 5245, gr-qc/0407052; A. Ashtekar, J. Baez,
+  A. Corichi, K. Krasnov, PRL 80 (1998) 904. Verify before citing.
+- *background* W. T. Tutte, *A census of planar maps*, Canad. J. Math. 15 (1963) 249; R. C. Mullin, *On the enumeration of tree-rooted maps*,
+  Canad. J. Math. 19 (1967) 174; V. Knizhnik–A. Polyakov–A. Zamolodchikov (KPZ), Mod. Phys. Lett. A 3 (1988) 819.
+  Verify before citing.
+- *background* R. Penrose, *Naked singularities* (1973) and G. Huisken–T. Ilmanen / H. Bray for the Penrose inequality;
+  D. Christodoulou, R. Ruffini, PRD 4 (1971) 3552. Verify before citing.
+- From the fork `brentharts/openai_math_yang_mills`: the OpenAI math release entries on near-Kerr strong cosmic censorship (264),
+  FK planar maps and Liouville quantum gravity (211); the fork read abstracts and introductions, not proofs.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G15. Weak-coupling gaps of small SU(2) plaquette clusters from one matrix: K = d^T d.
+"""G18. Weak-coupling gaps of small SU(2) plaquette clusters from one matrix: K = d^T d.
 
 Hartshorn's SU(2) Hamiltonian clusters (one plaquette, the two-plaquette ladder, the three-plaquette strip and the
 L-shape) have weak-coupling (harmonic) gaps sqrt 8, sqrt 6, 2 sqrt(2 - cos(pi/4)), and for the L-shape the same

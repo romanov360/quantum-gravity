@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# G15. The harmonic modes of a strip of `N` plaquettes
+# G18. The harmonic modes of a strip of `N` plaquettes
 
 At weak coupling the plaquette fluxes of a planar SU(2) cluster are oscillators with kinetic matrix `K = 4 I − A`,
 where `A` is the adjacency matrix of the graph of plaquettes sharing a link (`python/qg/cluster_gap.py`). For a

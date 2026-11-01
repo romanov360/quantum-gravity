@@ -17,6 +17,7 @@ phases, which simulations have seen but nobody has proved anything about.
 | Path | What |
 |---|---|
 | [`paper/main.pdf`](paper/main.pdf) | Draft: *A gap is not a graviton: strong-coupling exclusions for lattice gravity in first-order form* (G1, G8, G6, G4, G10, G3, G7) |
+| [`SUMMARY.md`](SUMMARY.md) | Short summary: who did what |
 | [`PROGRESS.md`](PROGRESS.md) | Status of ideas G0–G19 |
 | [`OPEN.md`](OPEN.md) | G0: four open problems of lattice quantum gravity, mirroring 4Y-M's |
 | [`docs/hartshorn-bridge.md`](docs/hartshorn-bridge.md) | How this repository answers the open items of Hartshorn's *Spin Networks on the SU(2) Ladder*, with predictions for his code |

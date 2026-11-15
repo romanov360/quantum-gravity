@@ -76,7 +76,9 @@ class Net:
         e += sum(c(t[i]) + c(b[i]) for i in range(2, N))
         e += sum(c(v[i]) for i in range(1, N))
         return e
-    def states(self, lam):
+    def states_slow(self, lam):
+        """Original enumerator: every label tuple under the energy bound, validity checked at the end.  Kept as the reference
+        for states(); about 1e6 calls for 900 states at N = 4."""
         N = self.N
         kmax = int(np.sqrt(4 * lam)) + 2
         out = []
@@ -95,6 +97,51 @@ class Net:
                 if e <= lam + 1e-12:
                     rec(new)
         rec(())
+        return out
+    def states(self, lam):
+        """All valid labels with electric energy <= lam, built one plaquette boundary at a time so that both triangle
+        conditions (t_i, t_{i+1}, v_i) and (b_i, b_{i+1}, v_i) hold at every step, and the energy prune is exact (e_el is a
+        sum of non-negative terms, increasing in each label).  Returns the same set of states as states_slow (checked in
+        tests/test_g13_g16.py), in a different order, at a cost proportional to the number of states."""
+        N = self.N
+        c = lambda k: k * (k + 2) / 4
+        cut = lam + 1e-12
+        kmax = int(np.sqrt(4 * lam)) + 2
+        out = []
+        for ja in range(kmax):
+            if 3 * c(ja) > cut:
+                break
+            for jc in range(kmax):
+                e1 = 3 * c(ja) + 3 * c(jc)
+                if e1 > cut:
+                    break
+                t, b, v = [ja], [ja], []
+
+                def rec(i, e):
+                    last = i == N - 1
+                    ti, bi = t[-1], b[-1]
+                    for t2 in ((jc,) if last else range(kmax)):
+                        e_t = e if last else e + c(t2)
+                        if e_t > cut:
+                            break
+                        for b2 in ((jc,) if last else range(kmax)):
+                            e_b = e_t if last else e_t + c(b2)
+                            if e_b > cut:
+                                break
+                            for vi in range(max(abs(ti - t2), abs(bi - b2)), min(ti + t2, bi + b2) + 1):
+                                if (ti + t2 + vi) % 2 or (bi + b2 + vi) % 2:
+                                    continue
+                                e_v = e_b + c(vi)
+                                if e_v > cut:
+                                    break
+                                t.append(t2); b.append(b2); v.append(vi)
+                                if last:
+                                    out.append((ja, jc) + tuple(t[1:N - 1]) + tuple(b[1:N - 1]) + tuple(v))
+                                else:
+                                    rec(i + 1, e_v)
+                                t.pop(); b.pop(); v.pop()
+
+                rec(1, e1)
         return out
     def amp(self, p, s, s2, rule):
         t, b, v = self.unpack(s); t2, b2, v2 = self.unpack(s2)
@@ -166,27 +213,19 @@ def rule_general(kind, p, s, s2, net):
     return sg
 
 
-
-
-def rule_general(kind, p, s, s2, net):
-    t, b, v = net.unpack(s); t2, b2, v2 = net.unpack(s2)
-    N = net.N
-    if kind == 'end':
-        nb = 2 if p == 1 else N - 1
-        return -1.0 if ((t[nb] - b[nb]) // 2) % 2 else 1.0
-    sg = 1.0 if (t2[p] - t[p]) * (b2[p] - b[p]) > 0 else -1.0
-    for q in (p - 1, p + 1):
-        if 1 < q < N:
-            sg *= -1.0 if ((t[q] - b[q]) // 2) % 2 else 1.0
-    return sg
-
-
-def lowest(N, lam, g2, k=6):
-    """lowest k levels of H_N at coupling g2 with electric-energy cut lam (in units of C(j))."""
+def lowest(N, lam, g2, k=6, method="lanczos"):
+    """lowest k levels of H_N at coupling g2 with electric-energy cut lam (in units of C(j)).
+    method "lanczos" (default): plain Lanczos for the algebraically smallest eigenvalues.  method "shift_invert": the
+    original sigma = 0 factorisation, same eigenvalues (all levels are positive) but about 400 times slower at N = 4,
+    cut 40 (13 s against 0.03 s), because the sparse LU of H fills in."""
     H, W, S = Net(N).hamiltonian(lam, g2, rule_general)
     if len(S) <= k + 2:
         return np.sort(np.linalg.eigvalsh(H.toarray()))[:k], len(S)
-    return np.sort(sla.eigsh(H, k=k, sigma=0, which='LM', return_eigenvectors=False)), len(S)
+    if method == "shift_invert":
+        return np.sort(sla.eigsh(H, k=k, sigma=0, which='LM', return_eigenvectors=False)), len(S)
+    if method != "lanczos":
+        raise ValueError(method)
+    return np.sort(sla.eigsh(H, k=k, which='SA', tol=1e-12, return_eigenvectors=False)), len(S)
 
 
 if __name__ == "__main__":

@@ -67,6 +67,43 @@ def test_strip_levels():
     assert w4[0] == pytest.approx(3.67192, abs=2e-5)
 
 
+@pytest.mark.parametrize("N,lam,count", [(3, 20, 116), (4, 16, 215), (5, 10, 91)])
+def test_strip_fast_enumerator_equals_reference(N, lam, count):
+    """states() prunes on the triangle conditions while building; states_slow() is the original brute-force enumeration."""
+    net = spin_network_strip.Net(N)
+    a, b = net.states(lam), net.states_slow(lam)
+    assert len(a) == len(set(a)) == len(b) == count and set(a) == set(b)
+
+
+@pytest.mark.parametrize("N,lam,g2", [(3, 30, 0.4), (4, 24, 2.0)])
+def test_strip_lanczos_equals_shift_invert(N, lam, g2):
+    a, n = spin_network_strip.lowest(N, lam, g2, k=6)
+    b, _ = spin_network_strip.lowest(N, lam, g2, k=6, method="shift_invert")
+    assert n > 8 and max(abs(a - b)) < 1e-10
+
+
+def test_strip_weak_coupling_gaps_match_the_g16_table():
+    """The N = 4, g^2 = 0.4 gaps quoted in docs/G16 at cuts 32 and 40 (2.493, 2.298), and N = 3 at cut 40."""
+    def gap(N, lam, g2):
+        w, _ = spin_network_strip.lowest(N, lam, g2, k=3)
+        return w[1] - w[0]
+    assert gap(4, 32, 0.4) == pytest.approx(2.4931664, abs=1e-6)
+    assert gap(4, 40, 0.4) == pytest.approx(2.2984672, abs=1e-6)
+    assert gap(3, 40, 0.4) == pytest.approx(2.2768862, abs=1e-6)
+
+
+def test_strip_converged_gaps_at_g2_08():
+    """Regression values from this code (not independent): N = 3 at cut 60 and N = 4 at cut 56, both converged to ~1e-5.
+    Their ratio is above the harmonic ratio 0.95978, as it must be at finite coupling."""
+    def gap(N, lam):
+        w, _ = spin_network_strip.lowest(N, lam, 0.8, k=3)
+        return w[1] - w[0]
+    g3, g4 = gap(3, 60), gap(4, 56)
+    assert g3 == pytest.approx(2.0605925, abs=2e-5) and g4 == pytest.approx(2.0300401, abs=2e-5)
+    harmonic = [2 * math.sqrt(2 - math.cos(math.pi / (N + 1))) for N in (3, 4)]
+    assert g4 / g3 > harmonic[1] / harmonic[0]
+
+
 # G17 volume prefactor
 def test_volume_classical():
     from qg import volume_tetrahedron as vt

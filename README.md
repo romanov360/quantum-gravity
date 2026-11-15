@@ -56,7 +56,7 @@ phases, which simulations have seen but nobody has proved anything about.
 | `immirzi.py` | G13 | Immirzi parameter from three counting conventions: 0.12738…, 0.23753 29579 65920 66… (m = ±j), 0.27406 68582 32829 99… (all projections), certified by bisection with a tail bound and cross-checked by Newton; renewal-equation growth checked |
 | `kerr.py` | G14 | Kerr: Smarr and first law at both horizons, Penrose gap M r₋/2, A₊A₋ = (8πJ)² (exact); heuristic puncture count N ≥ 2π\|J\|/ln 2 |
 | `planar_maps.py` | G15 | Tutte 2, 9, 54 and Mullin 2, 10, 70 by brute force; FK dictionary (q, κ′, γ, c, γ_str); closed walks on A_{k+1} = Catalan, growth √q_k |
-| `spin_network_strip.py` | G16 | SU(2) strip of N = 3, 4, 5 plaquettes in the spin-network basis with signed 6j; levels agree with an independent Peter–Weyl calculation |
+| `spin_network_strip.py`, `strip_gap_scan.py` | G16 | SU(2) strip of N = 3, 4, 5 plaquettes in the spin-network basis with signed 6j; levels agree with an independent Peter–Weyl calculation; converged weak-coupling gaps (N = 4 to g² = 0.3) consistent with the harmonic formula at 0.1–0.2%, not confirmed |
 | `volume_tetrahedron.py` | G17 | volume prefactor √2/3 from the regular tetrahedron; max eigenvalue of the triple product → classical value as 1 − 3/(4j) (to j = 40); smallest volume 1.777 ℓ_P³ |
 
 ## Build
